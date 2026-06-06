@@ -162,131 +162,146 @@
 <!-- ============ WORKFLOW ============ -->
 <section id="workflow" class="workflow-section">
   <div class="wrap">
-    <div class="workflow-intro reveal">
-      <span class="sec-label">02 / Live Automation Example</span>
-      <h2 class="sec-title">See a real <em>AI workflow</em> in action</h2>
-      <p class="sec-subtitle">This is a live content automation pipeline we built — one click triggers a fully autonomous production chain from research to publishing.</p>
+
+    <div class="wf-header reveal">
+      <div>
+        <span class="sec-label">02 / Live Automation Example</span>
+        <h2 class="sec-title">See a real <em>AI workflow</em> in action</h2>
+        <p class="sec-subtitle">One click triggers a fully autonomous Instagram content pipeline — from AI research to published post, with you in control at every approval gate.</p>
+      </div>
+      <a href="#contact" class="btn teal wf-cta-btn">Build My Workflow →</a>
     </div>
 
-    <div class="workflow-split">
-      <div class="workflow-info reveal">
-        <h3 class="sec-title" style="font-size:clamp(22px,2.8vw,34px);">AI-Powered Instagram Content Pipeline</h3>
-        <p>One click triggers a fully autonomous content production pipeline. Claude researches trending AI topics, generates a complete reel script, caption, and hashtag set — then routes the approved content through Higgsfield for video generation and auto-posts to Instagram at peak engagement time.</p>
-        <p>This is one example of the kind of business-specific workflows we engineer. Your pipeline, your triggers, your rules — we build it to run itself.</p>
-        <a href="#contact" class="btn teal" style="margin-top:8px;">Build My Workflow →</a>
-      </div>
+    <!-- Pipeline canvas -->
+    <div class="pipeline-canvas reveal">
 
-      <div class="reveal">
-        <div class="wf-bar">
-          <div class="wf-bar-dots">
-            <span class="d1"></span><span class="d2"></span><span class="d3"></span>
-          </div>
-          <div class="wf-bar-title">instagram-content-pipeline.flow</div>
-          <div class="wf-bar-badge">Running</div>
+      <!-- Top status bar -->
+      <div class="pipeline-bar">
+        <div class="pb-left">
+          <div class="pb-dots"><span></span><span></span><span></span></div>
+          <span class="pb-file">instagram-content-pipeline.flow</span>
         </div>
-
-        <div class="flow-container">
-          <div class="flow-steps-wrap">
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-trigger">
-                <div class="f-icon">▶</div>
-                <div class="f-body">
-                  <div class="f-title">You click "Run"</div>
-                  <div class="f-sub">One-click activation → pipeline starts</div>
-                </div>
-                <span class="f-badge">Trigger</span>
-              </div>
-            </div>
-
-            <div class="flow-arrow"></div>
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-ai">
-                <div class="f-icon">🧠</div>
-                <div class="f-body">
-                  <div class="f-title">Claude researches trending topics</div>
-                  <div class="f-sub">AI/automation trends · SME-relevant content</div>
-                </div>
-                <span class="f-badge">AI</span>
-              </div>
-            </div>
-
-            <div class="flow-arrow"></div>
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-ai">
-                <div class="f-icon">✍️</div>
-                <div class="f-body">
-                  <div class="f-title">Claude generates content package</div>
-                  <div class="f-sub">Outputs all four assets simultaneously</div>
-                  <div class="f-outputs">
-                    <span class="f-out-tag">Reel Script</span>
-                    <span class="f-out-tag">Caption</span>
-                    <span class="f-out-tag">Hashtags</span>
-                    <span class="f-out-tag">Hook Line</span>
-                  </div>
-                </div>
-                <span class="f-badge">AI</span>
-              </div>
-            </div>
-
-            <div class="flow-arrow"></div>
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-human">
-                <div class="f-icon">👁️</div>
-                <div class="f-body">
-                  <div class="f-title">You review & approve</div>
-                  <div class="f-sub">Or ask Claude to tweak — you stay in control</div>
-                </div>
-                <span class="f-badge">Human</span>
-              </div>
-            </div>
-
-            <div class="flow-arrow"></div>
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-ai">
-                <div class="f-icon">🎬</div>
-                <div class="f-body">
-                  <div class="f-title">Script → Higgsfield AI</div>
-                  <div class="f-sub">Video generated automatically from approved script</div>
-                </div>
-                <span class="f-badge">AI</span>
-              </div>
-            </div>
-
-            <div class="flow-arrow"></div>
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-human">
-                <div class="f-icon">✅</div>
-                <div class="f-body">
-                  <div class="f-title">You review the video</div>
-                  <div class="f-sub">Final human approval before publishing</div>
-                </div>
-                <span class="f-badge">Human</span>
-              </div>
-            </div>
-
-            <div class="flow-arrow"></div>
-
-            <div class="flow-node-wrap">
-              <div class="f-card type-output">
-                <div class="f-icon">📲</div>
-                <div class="f-body">
-                  <div class="f-title">Auto-posts to Instagram</div>
-                  <div class="f-sub">Caption + hashtags + tags · posted at peak time</div>
-                </div>
-                <span class="f-badge">Published</span>
-              </div>
-            </div>
-
-          </div>
+        <div class="pb-right">
+          <span class="pb-status"><span class="pb-pulse"></span>Running</span>
+          <span class="pb-stat">7 nodes · 0 errors</span>
         </div>
       </div>
-    </div>
+
+      <!-- Node grid -->
+      <div class="pipeline-body">
+
+        <!-- Row 1: single trigger -->
+        <div class="pipe-row">
+          <div class="pipe-node n-trigger">
+            <div class="pn-icon">▶</div>
+            <div class="pn-info">
+              <div class="pn-tag">Trigger</div>
+              <div class="pn-title">You click "Run"</div>
+              <div class="pn-desc">One-click activation</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipe-connector single"><div class="pc-line"></div><div class="pc-arrow"></div></div>
+
+        <!-- Row 2: AI research -->
+        <div class="pipe-row">
+          <div class="pipe-node n-ai">
+            <div class="pn-icon">🧠</div>
+            <div class="pn-info">
+              <div class="pn-tag">Claude AI</div>
+              <div class="pn-title">Research trending topics</div>
+              <div class="pn-desc">AI/automation · SME-relevant</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipe-connector single"><div class="pc-line"></div><div class="pc-arrow"></div></div>
+
+        <!-- Row 3: Content generation with 4 outputs branching -->
+        <div class="pipe-row">
+          <div class="pipe-node n-ai wide">
+            <div class="pn-icon">✍️</div>
+            <div class="pn-info">
+              <div class="pn-tag">Claude AI</div>
+              <div class="pn-title">Generate content package</div>
+              <div class="pn-desc">Outputs all assets simultaneously</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Branch outputs -->
+        <div class="pipe-branches">
+          <div class="branch-line-top"></div>
+          <div class="branch-outputs">
+            <div class="branch-out bo-1"><span>📄</span> Reel Script</div>
+            <div class="branch-out bo-2"><span>💬</span> Caption</div>
+            <div class="branch-out bo-3"><span>#</span> Hashtags</div>
+            <div class="branch-out bo-4"><span>🪝</span> Hook Line</div>
+          </div>
+          <div class="branch-merge"></div>
+        </div>
+
+        <!-- Row 4: Human review -->
+        <div class="pipe-row">
+          <div class="pipe-node n-human">
+            <div class="pn-icon">👁️</div>
+            <div class="pn-info">
+              <div class="pn-tag">Human Gate</div>
+              <div class="pn-title">You review &amp; approve</div>
+              <div class="pn-desc">Or ask Claude to tweak</div>
+            </div>
+            <div class="pn-gate">APPROVAL</div>
+          </div>
+        </div>
+
+        <div class="pipe-connector single"><div class="pc-line"></div><div class="pc-arrow"></div></div>
+
+        <!-- Row 5: Video generation -->
+        <div class="pipe-row">
+          <div class="pipe-node n-ai">
+            <div class="pn-icon">🎬</div>
+            <div class="pn-info">
+              <div class="pn-tag">Higgsfield AI</div>
+              <div class="pn-title">Generate video</div>
+              <div class="pn-desc">Script → video automatically</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipe-connector single"><div class="pc-line"></div><div class="pc-arrow"></div></div>
+
+        <!-- Row 6: Human video review -->
+        <div class="pipe-row">
+          <div class="pipe-node n-human">
+            <div class="pn-icon">✅</div>
+            <div class="pn-info">
+              <div class="pn-tag">Human Gate</div>
+              <div class="pn-title">Review the video</div>
+              <div class="pn-desc">Final check before publishing</div>
+            </div>
+            <div class="pn-gate">APPROVAL</div>
+          </div>
+        </div>
+
+        <div class="pipe-connector single"><div class="pc-line"></div><div class="pc-arrow"></div></div>
+
+        <!-- Row 7: Publish -->
+        <div class="pipe-row">
+          <div class="pipe-node n-publish">
+            <div class="pn-icon">📲</div>
+            <div class="pn-info">
+              <div class="pn-tag">Published</div>
+              <div class="pn-title">Auto-posts to Instagram</div>
+              <div class="pn-desc">Caption · hashtags · peak time</div>
+            </div>
+            <div class="pn-live"><span></span>Live</div>
+          </div>
+        </div>
+
+      </div><!-- /pipeline-body -->
+    </div><!-- /pipeline-canvas -->
+
   </div>
 </section>
 
