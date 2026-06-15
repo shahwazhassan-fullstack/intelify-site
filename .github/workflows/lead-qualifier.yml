@@ -1,0 +1,114 @@
+name: Lead Qualifier
+
+# A reusable "routine": fill in the form, press Run, and the lead-qualifier
+# researches + qualifies each company and publishes the results for that run.
+run-name: "Lead Qualifier · ${{ inputs.companies }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      companies:
+        description: "Company domains, comma-separated (e.g. stripe.com, notion.so, vercel.com). Optional name: Acme|acme.com"
+        required: true
+        type: string
+      offer:
+        description: "What you sell, in plain words. Leave blank to use lead-qualifier/offer.md"
+        required: false
+        type: string
+      limit:
+        description: "Max companies to process (blank = all)"
+        required: false
+        type: string
+      threshold:
+        description: "Qualify score threshold 1-10 (blank = default 6)"
+        required: false
+        type: string
+      draft_emails:
+        description: "Draft AIDA cold emails for qualified leads"
+        required: false
+        default: true
+        type: boolean
+      model:
+        description: "Claude model — quality vs cost"
+        required: false
+        default: claude-sonnet-4-6
+        type: choice
+        options:
+          - claude-sonnet-4-6
+          - claude-opus-4-8
+          - claude-haiku-4-5
+      validate_only:
+        description: "Dry run: check inputs only, spend no API credits"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lead-qualifier
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: lead-qualifier/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install browser (for JS-heavy career pages)
+        # Non-fatal: the fetcher falls back to plain HTTP if this is unavailable.
+        run: python -m playwright install --with-deps chromium || echo "Playwright browser unavailable — continuing with HTTP-only fetching."
+
+      - name: Build inputs from the form
+        env:
+          COMPANIES: ${{ inputs.companies }}
+          OFFER: ${{ inputs.offer }}
+        run: python scripts/prepare_inputs.py
+
+      - name: Run lead qualifier
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ inputs.model }}
+          LIMIT: ${{ inputs.limit }}
+          THRESHOLD: ${{ inputs.threshold }}
+          DRAFT_EMAILS: ${{ inputs.draft_emails }}
+          VALIDATE_ONLY: ${{ inputs.validate_only }}
+        run: |
+          args=(-i leads.csv -o offer.md --output-dir output)
+          if [ "$VALIDATE_ONLY" = "true" ]; then args+=(--validate); fi
+          if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
+          if [ -n "$THRESHOLD" ]; then args+=(--threshold "$THRESHOLD"); fi
+          if [ "$DRAFT_EMAILS" = "true" ]; then args+=(--draft-emails); else args+=(--no-draft-emails); fi
+          echo "Running: python -m lead_qualifier.main ${args[*]}"
+          python -m lead_qualifier.main "${args[@]}"
+
+      - name: Publish results to the run summary
+        if: always()
+        run: |
+          if [ -f output/run_summary.md ]; then
+            cat output/run_summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No summary produced — check the run logs above." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload results (CSVs + briefs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lead-results-${{ github.run_number }}
+          path: |
+            lead-qualifier/output/**
+            !lead-qualifier/output/cache.db
+          if-no-files-found: warn
+          retention-days: 30
