@@ -117,21 +117,43 @@ The spreadsheet schema is **stable** — same columns every run.
 
 ---
 
+## AI provider — a free key works fine
+
+The qualifier needs **one** AI key. Choose the provider with `LLM_PROVIDER`:
+
+| Provider | `LLM_PROVIDER` | Key env var | Cost | Get a key |
+|----------|----------------|-------------|------|-----------|
+| Google Gemini | `gemini` | `GEMINI_API_KEY` | **Free** tier | aistudio.google.com |
+| Groq | `groq` | `GROQ_API_KEY` | **Free** tier | console.groq.com |
+| OpenAI | `openai` | `OPENAI_API_KEY` | Paid | platform.openai.com |
+| Anthropic (Claude) | `anthropic` *(default)* | `ANTHROPIC_API_KEY` | Paid | console.anthropic.com |
+
+Only the key for your chosen provider is needed (a generic `LLM_API_KEY` also
+works). Everything except Anthropic talks to each provider's **OpenAI-compatible
+endpoint**, so other OpenAI-compatible gateways work too via `LLM_BASE_URL`.
+
+The free models (Gemini Flash, Llama 3.3 70B) are very usable here; Claude/GPT-class
+models write somewhat sharper emails. Free tiers rate-limit — calls retry with
+backoff automatically, but if you still hit limits, lower `MAX_WORKERS` (e.g. `2`).
+
 ## Environment variables (`.env`)
 
 | Variable | Required? | Purpose |
 |----------|-----------|---------|
-| `ANTHROPIC_API_KEY` | **Yes** | Qualification scoring + brief/email generation. |
-| `ANTHROPIC_MODEL`   | No | Claude model id (default: `claude-opus-4-8`). For high-volume runs set `claude-sonnet-4-6` or `claude-haiku-4-5` to cut cost. |
+| `LLM_PROVIDER` | No | `gemini` \| `groq` \| `openai` \| `anthropic` (default). |
+| `GEMINI_API_KEY` / `GROQ_API_KEY` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | **One** | Key for the provider you picked — scoring + brief/email generation. |
+| `LLM_API_KEY`       | No | Generic fallback key if the provider-specific one isn't set. |
+| `LLM_MODEL`         | No | Override the model (blank = best default per provider). |
+| `LLM_BASE_URL`      | No | Advanced: custom OpenAI-compatible endpoint. |
 | `SCORE_THRESHOLD`   | No | Qualify threshold on the 1–10 scale (default 6). |
 | `REQUEST_DELAY`     | No | Polite delay between requests to a host (default 1.0s). |
-| `MAX_WORKERS`       | No | Parallel company workers (default 4). |
+| `MAX_WORKERS`       | No | Parallel company workers (default 4; lower on free tiers). |
 | `THEIRSTACK_API_KEY`| No | Only for `--history-provider api` (paid 6-month history). |
 | `SCRAPER_API_KEY`   | No | Only if you wire in a hosted scraper; plain Playwright needs no key. |
 
-Missing required keys fail at startup with a clear message naming the variable.
-**Current openings require no paid key** — only the optional retroactive
-6-month history does.
+Missing the required key fails at startup with a clear message naming the
+variable. **Current openings require no paid key** — only the optional
+retroactive 6-month history does.
 
 ---
 
