@@ -28,15 +28,20 @@ on:
         required: false
         default: true
         type: boolean
-      model:
-        description: "Claude model — quality vs cost"
+      provider:
+        description: "AI provider (its key must be saved in repo secrets)"
         required: false
-        default: claude-sonnet-4-6
+        default: gemini
         type: choice
         options:
-          - claude-sonnet-4-6
-          - claude-opus-4-8
-          - claude-haiku-4-5
+          - gemini
+          - groq
+          - openai
+          - anthropic
+      model:
+        description: "Model override (leave blank = best default for the provider)"
+        required: false
+        type: string
       validate_only:
         description: "Dry run: check inputs only, spend no API credits"
         required: false
@@ -78,8 +83,15 @@ jobs:
 
       - name: Run lead qualifier
         env:
+          LLM_PROVIDER: ${{ inputs.provider }}
+          LLM_MODEL: ${{ inputs.model }}
+          # Set the secret only for the provider you picked; the rest can stay empty.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_MODEL: ${{ inputs.model }}
+          # Free AI tiers rate-limit; 2 workers keeps runs smooth (calls also auto-retry).
+          MAX_WORKERS: "2"
           LIMIT: ${{ inputs.limit }}
           THRESHOLD: ${{ inputs.threshold }}
           DRAFT_EMAILS: ${{ inputs.draft_emails }}

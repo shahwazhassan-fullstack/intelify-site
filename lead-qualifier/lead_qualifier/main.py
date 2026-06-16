@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Optional
 
 import typer
-from anthropic import Anthropic
 from rich.console import Console
 from rich.table import Table
 
@@ -27,6 +26,7 @@ from .config import ConfigError, load_settings
 from .hiring_signals import HiringResearcher
 from .ingest import load_leads
 from .job_history import get_history_provider
+from .llm import build_llm_client
 from .models import (
     Brief,
     CompanyRecord,
@@ -155,7 +155,7 @@ def _validate(input_file: Path, offer_file: Path, env_file: Optional[Path]) -> i
     # 1. Secrets / config
     try:
         settings = load_settings(env_file, validate_keys=True)
-        console.print(f"[green]✓[/green] ANTHROPIC_API_KEY present; model = {settings.model}")
+        console.print(f"[green]✓[/green] {settings.llm_provider} API key present; model = {settings.model}")
         console.print(f"[green]✓[/green] score threshold = {settings.score_threshold}")
     except ConfigError as e:
         console.print(f"[red]✗[/red] {e}")
@@ -245,7 +245,7 @@ def run(
     output_dir.mkdir(parents=True, exist_ok=True)
     cache = None if no_cache else Cache(output_dir / "cache.db")
     fetcher = Fetcher(settings.user_agent, delay=settings.request_delay, cache=cache)
-    client = Anthropic(api_key=settings.anthropic_api_key)
+    client = build_llm_client(settings)
     try:
         history = get_history_provider(history_provider, settings, snapshots_db=output_dir / "snapshots.db")
     except ConfigError as e:

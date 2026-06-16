@@ -9,9 +9,8 @@ from __future__ import annotations
 import json
 from urllib.parse import urljoin
 
-from anthropic import Anthropic
-
 from .config import Settings, load_prompt
+from .llm import LLMClient
 from .models import CompanySummary
 from .utils.cache import Cache, make_key
 from .utils.fetcher import Fetcher
@@ -30,7 +29,7 @@ PER_PAGE_CHARS = 6000
 
 
 class CompanyResearcher:
-    def __init__(self, settings: Settings, fetcher: Fetcher, client: Anthropic, cache: Cache | None = None):
+    def __init__(self, settings: Settings, fetcher: Fetcher, client: LLMClient, cache: Cache | None = None):
         self.settings = settings
         self.fetcher = fetcher
         self.client = client
@@ -104,12 +103,8 @@ class CompanyResearcher:
             corpus=corpus,
         )
         try:
-            resp = self.client.messages.create(
-                model=self.settings.model,
-                max_tokens=2000,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            data = _extract_json(response_text(resp))
+            text = self.client.complete(prompt, max_tokens=2000)
+            data = _extract_json(text)
         except Exception as e:  # noqa: BLE001
             log.warning(f"[{domain}] summarization failed: {e}")
             return CompanySummary(domain=domain, pages_read=pages_read,
@@ -123,16 +118,6 @@ class CompanyResearcher:
             size_stage_signals=data.get("size_stage_signals", ""),
             pages_read=pages_read,
         )
-
-
-def response_text(resp) -> str:
-    """Concatenate all text blocks from an Anthropic Messages response.
-
-    Robust to responses that lead with non-text blocks (e.g. thinking) — never
-    assumes content[0] is the text block.
-    """
-    parts = [b.text for b in resp.content if getattr(b, "type", None) == "text"]
-    return "\n".join(parts).strip()
 
 
 def _extract_json(text: str) -> dict:

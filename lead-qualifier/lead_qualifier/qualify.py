@@ -10,10 +10,9 @@ from __future__ import annotations
 
 import json
 
-from anthropic import Anthropic
-
-from .company_research import _extract_json, response_text
+from .company_research import _extract_json
 from .config import Settings, load_prompt
+from .llm import LLMClient
 from .models import CompanySummary, HiringSignals, QualResult
 from .utils.cache import Cache, make_key
 from .utils.logger import get_logger
@@ -22,7 +21,7 @@ log = get_logger("qualify")
 
 
 class Qualifier:
-    def __init__(self, settings: Settings, client: Anthropic, offer_text: str, cache: Cache | None = None):
+    def __init__(self, settings: Settings, client: LLMClient, offer_text: str, cache: Cache | None = None):
         self.settings = settings
         self.client = client
         self.offer_text = offer_text
@@ -50,12 +49,8 @@ class Qualifier:
         )
 
         try:
-            resp = self.client.messages.create(
-                model=self.settings.model,
-                max_tokens=1500,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            data = _extract_json(response_text(resp))
+            text = self.client.complete(prompt, max_tokens=1500)
+            data = _extract_json(text)
         except Exception as e:  # noqa: BLE001
             log.warning(f"[{domain}] qualification failed: {e}")
             return QualResult(domain=domain, error=f"qualification failed: {e}")
